@@ -16,17 +16,17 @@ minimal_mistakes_skin    : "dirt" # "air", "aqua", "contrast", "dark", "dirt", "
 
 # Site Settings
 locale                   : "ko-KR"
-title                    : "superdevsong blog"
+title                    : "Developer Lab"
 title_separator          : "|"
-subtitle                 : 이거무엇?
+subtitle                 : "위대한 개발자가 되고싶은 그의 발자취"
 name                     : "Song YoungWoo"
 description              : "이곳은 저의 포트폴리오 사이트입니다. ^^"
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+repository               : "superdevsong/superdevsong.github.io" # GitHub username/repo-name 
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
-masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
+logo                     :  # path of logo image to display in the masthead
+masthead_title           : "SuperDevSong's Blog" # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
@@ -102,11 +102,11 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
-  location         : "Somewhere"
-  email            :
+  name             : "Song YoungWoo"
+  avatar           : "/assets/images/mypicture.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : "컴공과 4년제 대학교 졸업"
+  location         : #"somewhere"
+  email            : "superdevsong@gmail.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -269,7 +269,7 @@ tag_archive:
 
 # HTML Compression
 # - https://jch.penibelst.de/
-compress_html:
+compress_html:    
   clippings: all
   ignore:
     envs: development
@@ -283,8 +283,21 @@ defaults:
       type: posts
     values:
       layout: single
+      show_date: true
       author_profile: true
       read_time: true
-      comments: # true
+      comments: true
       share: true
       related: true
+   # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+      read_time: false
+      comments: false
+      share: true
+      related: false  
+
