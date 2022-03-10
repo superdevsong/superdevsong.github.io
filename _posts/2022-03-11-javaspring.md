@@ -1,5 +1,5 @@
 ---
-title:  "Spring"
+title: "Spring"
 categories:
   -  Spring
 tags:
