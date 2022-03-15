@@ -65,187 +65,6 @@ Application context + meta data 이조합으로 ioc container가 구현이 가�
 일단 xml을 configuration data 로사용하는 코드를 보겠다.
 대략적으로 사용할코드들이다.
 
-
-SongExam
-```java
-public class SongExam implements Exam {
-
-	/*exam 인터페이스를 상속하는 클래스야
-
-	 * 내용은 각 과목에대한 변수들 그리고 인터페이스에서 구현한
-
-	 * 내용들을 여기서 다시 재구현 했어 어려운 내용은 없으니 이정도만 설명할게*/
-
-	private int kor;
-
-	private int eng;
-
-	private int math;
-
-	private int com;
-
-
-
-	public int getKor() {
-
-		return kor;
-
-	}
-
-
-
-	public void setKor(int kor) {
-
-		this.kor = kor;
-
-	}
-
-
-
-	public int getEng() {
-
-		return eng;
-
-	}
-
-
-
-	public void setEng(int eng) {
-
-		this.eng = eng;
-
-	}
-
-
-
-	public int getMath() {
-
-		return math;
-
-	}
-
-
-
-	public void setMath(int math) {
-
-		this.math = math;
-
-	}
-
-
-
-	public int getCom() {
-
-		return com;
-
-	}
-
-
-
-	public void setCom(int com) {
-
-		this.com = com;
-
-	}
-
-
-
-	@Override
-
-	public int total() {
-
-		// TODO Auto-generated method stub
-
-		return kor+eng+math+com;
-
-	}
-
-
-
-	@Override
-
-	public float avg() {
-
-		// TODO Auto-generated method stub
-
-		return total()/4.0f;
-
-	}
-
-
-
-}
-
-```
-GridExamConsole
-```java
-public class GridExamConsole implements ExamConsole {
-
-	Exam exam;
-
-	public GridExamConsole() {
-
-		// 여기가 비어있어서 당황스럽겠지만 최초에 내가 구현할때는 아래에있는 생성자로 구현해서 그래
-
-	}
-
-	public GridExamConsole(Exam exam) {
-
-		//성적을 받는 부분이야
-
-		super();
-
-		this.exam = exam;
-
-	}
-
-
-
-	@Override
-
-	public void print() {
-
-		//성적출력
-
-		System.out.println("┌─────────┬─────────┐");
-
-		System.out.println("│  total  │   avg   │");
-
-		System.out.println("├─────────┼─────────┤");
-
-		 System.out.printf("│   %3d   │  %3.2f   │\n",exam.total(),exam.avg());
-
-		System.out.println("└─────────┴─────────┘");
-
-
-
-	}
-
-
-
-	@Override
-
-	public void setExam(Exam exam) {
-
-		/*성적을 받는 dependency injection부분이야
-
-		 * 위에꺼도 맞지만 스프링에서는 여기가 더 효율적이지*/
-
-		this.exam = exam;
-
-
-
-		
-
-	}
-
-
-
-}
-```
-
-여기서 부터 봐주기바람
-
 Program
 ```java
 public class Program {
@@ -287,6 +106,87 @@ Setting.xml
 <h6>DI(Dependency Injection)</h6>
 ------
 	
+스프링에서 dependency Injection을 지원한다 그렇다면 이 dependency Injection이라는 뭘까 말의 뜻만 본다면 의존성 주입이다. 이것을 docs로 찾아보자 
+
+스프링 docs에서는 다음과 같이 나왔다. “Dependency Injection(DI; 의존성 주입)은 오브젝트가 컨스트럭터 인수, 팩토리 메서드에 대한 인수 또는 팩토리 메서드에서 반환된 오브젝트인스턴스에 설정된 속성을 통해서만 의존성(즉, 작업하는 다른 오브젝트)을 정의하는 프로세스입니다.”
+
+와 공부했었던 내용이지만 docs로봐선 이거 절대로 한번에 이해 못한다. 그러나 docs의말을 좀더 쉽게 말하자면 예시를 들어 설명하겠다.
+
+```java
+public class Program {
+	
+	private SongExam songExam;
+	public Program() {
+		songExam = new SongExam();
+	}
+}
+```
+
+이 코드는 SongExam 이라는 외부 객체를 사용한다. 다시 말해 SongExam이라는 외부객체에 의존한다해서 이를 의존성이 있다고 한다. 
+
+근데 잘보면 SongExam 객체는 Program 객체에서 인스턴스화 하는것을 볼수있다. 우리는 이런것을 강하게 의존한다고 볼수있다.
+
+그 이유는 SongExam 객체를 Program 객체가 알아야 하고 만약에 Program객체가 사라진다면 SongExam객체도 같이 사라지기때문
+지금당장에 문제가 없어보여도 SongExam에서 우리가 더좋은코드가 있어 바꾸고싶다고해도 코드를 바꿔야한다는 수고를 들여야한다.
+
+위 문제를 해결하기위해서는 일단 다형성을 넣어줘어야한다.
+
+다음코드로 설명하겠다.
+
+```java
+public interface Exam {
+	
+}
+
+
+public class SongExam implements Exam {
+	
+
+}
+
+```
+
+그 다음으로 강한 결합성을 해결하기 위해 다음코드와 같이 인터페이스로 받고 외부에서 의존성을 주입해줘야 된다.
+
+```java
+
+public class Program {
+	
+	private Exam exam;
+	public Program(Exam exam) {
+		this.exam = exam;
+	}
+}
+
+```
+
+그럼 스프링에서는 위의 코드를 활용해 다음과같이 ioc컨테이너에서 의존성주입을 도와준다.
+
+```java
+public class Beanfactory(){
+
+public void beanfactory() { 
+		// Bean의 생성 
+		SongExam songExam = new SongExam(); 
+		// 의존성 주입 
+		Program program = new Program(songExam); 
+	}
+}
+```
+
+위에 어렵게 말한 docs의 말도 이제 어느정도 감이 올것이다.
+
+di를 정리하자면 의존성 주입을 외부에서 두 객체의 관계를 정의, 클래스 레벨에서는 의존관계가 고정되지 않도록 하고 런타임 시에 관계를 다이나믹하게 주입 하는 디자인패턴이라고 알면된다. 스프링은 이를 지원하는것일뿐이다.
+
+출처: https://mangkyu.tistory.com/150 [MangKyu's Diary] 이분 설명 진짜 잘한다…
+
+자그럼 결과적으로 어떻게 지원하는지 알아보겠다.
+
+이건 내일부터 ^^ aop까지 차근차근 크흠
+
+
+
+
 <h6>AOP</h6>
 ------
 
