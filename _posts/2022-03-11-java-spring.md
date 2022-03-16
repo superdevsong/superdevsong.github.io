@@ -89,17 +89,13 @@ Setting.xml
 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="exam" class="spring.di.entity.SongExam" />
+	
 
-	<bean id="console" class="spring.di.ui.GridExamConsole">
-
-	<property name="exam" ref="exam"/>
-
-	</bean>
+	
 
 </beans>
 ```
-이 설정파일을 통해 위에 코드의 객체를 bean형태로 등록한다 자세한 설명은 di를 통해 한번더 하겠다. 어쨌든 이 메타데이터 파일을 ioc 컨테이너 형성에 사용한다는 것을 알수있음
+위의 메타데이터 파일을 ioc 컨테이너 형성에 사용한다.
 
 
 
@@ -160,7 +156,7 @@ public class Program {
 
 ```
 
-그럼 스프링에서는 위의 코드를 활용해 다음과같이 ioc컨테이너에서 의존성주입을 도와준다.
+그럼 스프링에서는 위의 코드를 활용해 다음과 같이 ioc컨테이너에서 의존성주입을 도와준다.
 
 ```java
 public class Beanfactory(){
@@ -178,10 +174,175 @@ public void beanfactory() {
 
 di를 정리하자면 의존성 주입을 외부에서 두 객체의 관계를 정의, 클래스 레벨에서는 의존관계가 고정되지 않도록 하고 런타임 시에 관계를 다이나믹하게 주입 하는 디자인패턴이라고 알면된다. 스프링은 이를 지원하는것일뿐이다.
 
-출처: https://mangkyu.tistory.com/150 [MangKyu's Diary] 이분 설명 진짜 잘한다…
+출처: https://mangkyu.tistory.com/150 [MangKyu's Diary] 
 
-자그럼 결과적으로 어떻게 지원하는지 알아보겠다.
+자 그럼 스프링에서 di를 어떻게 써야하는지 코드를 통해 알아보자.
 
+먼저 di가 필요한 상황을 가정하여 다음과 같은 객체들을 만들겠다.
+
+시험의 성적의 합과 평균을 나타내는 인터페이스 Exam
+
+Exam을 상속해 자세한 시험을 정의한 songExam
+
+```java
+public interface Exam {
+	int total();//합계
+	float avg();//평균
+}
+
+
+public class SongExam implements Exam {
+	
+	private int kor;//국어 점수
+	private int eng;//영어 점수
+	private int math;//수학 점수
+	private int com;//컴퓨터 점수
+
+	public int getKor() {
+		return kor;
+	}
+
+	public void setKor(int kor) {
+		this.kor = kor;
+	}
+
+	public int getEng() {
+		return eng;
+	}
+
+	public void setEng(int eng) {
+		this.eng = eng;
+	}
+
+	public int getMath() {
+		return math;
+	}
+
+	public void setMath(int math) {
+		this.math = math;
+	}
+
+	public int getCom() {
+		return com;
+	}
+
+	public void setCom(int com) {
+		this.com = com;
+	}
+
+	@Override
+	public int total() {
+		// TODO Auto-generated method stub
+		return kor+eng+math+com;
+	}
+
+	@Override
+	public float avg() {
+		// TODO Auto-generated method stub
+		return total()/4.0f;
+	}
+
+}
+```
+
+두번째로 시험결과를 출력해줄 ExamConsole
+
+ExamConsole을 상속해서 시험 결과를 inline으로 출력하는 InlineExamConsole
+
+```java
+public interface ExamConsole {
+	
+	void print();//성적 출력 
+
+	void setExam(Exam exam);//시험 등록
+	
+}
+
+public class InlineExamConsole implements ExamConsole {
+	private Exam exam;
+	public InlineExamConsole() {}
+	public InlineExamConsole(Exam exam) {
+		this.exam = exam;
+	}
+
+	@Override
+	public void print() {
+		System.out.printf("total is %d, avg if %f\n",exam.total(),exam.avg());
+	}
+
+	@Override
+	public void setExam(Exam exam) {
+		this.exam = exam;
+		
+	}
+
+}
+```
+
+InlineExamConsole은 외부 객체인 Exam에 의존성을 보이고 있고 di의 필요성을 우리는 알수있다.
+
+스프링을 통해 di를 하기위해 다음과 같이 main함수에 적겠다.
+
+```java
+public static void main(String[] args) {
+
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring/di/setting.xml");
+		
+	}
+```
+먼저 setting.xml이라는 configuration data를 통해 ioc 컨테이너를 형성한다. 이유는 위에서 말했듯이 스프링은 ioc컨테이너를 객체를 제어하기때문
+
+그럼 어떻게 위의 객체들을 ioc컨테이너의 bean으로 만들까? 방법은 두가지가 있다. 어노테이션을 활용하는 방법과 xml이다.
+
+일단 xml을 먼저보겠다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="exam" class="spring.di.entity.SongExam" >
+	
+	<property name="kor" value="20"></property>
+	<property name="eng" value="20"></property>
+	<property name="math" value="20"></property>
+	<property name="com" value="20"></property>
+	</bean>
+	<bean id="console" class="spring.di.ui.InlineExamConsole">
+	<property name="exam" ref="exam"/>
+	</bean>
+</beans>
+```
+
+왠지 보기만해도 뭔말인지 예상이 갈수있다. configuartion data에 다음과 같이 bean태그를 사용해 id 와 class를 정의해주면
+id를 변수이름으로한 class 내용의 객체를 bean형태로 저장해준다.
+
+property 태그를 활용해 해당 bean객체의 프로퍼티들을 정의할수있다.
+
+ name으로 변수의 이름으로 해주면 변수 set 함수를 통해 알아서 value나 ref값을 주입을 해준다.
+value는 기본적인 리터값을 ref는 다른 bean을 주입한다.
+
+즉 id가 console인 bean은 프로퍼티인 exam은 ref를 통해 id가 exam인 bean을 di를 한다.
+
+그럼 이렇게 di가 된다는것을 알았다면 이를 main함수에서 활용하기 위해 다음과 같이 코드를 작성하면된다.
+
+```java
+
+public static void main(String[] args) {
+	
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring/di/setting.xml");
+	
+		ExamConsole console = context.getBean(ExamConsole.class);//ioc컨테이너에서 ExamConsole.class를 상속한 유사한 빈을 가져옴
+
+		console.print(); //빈함수 출력
+	}
+```
+주석 만으로도 이해가 갈거라 생각하지만 더 설명을 하자면 해당 ioc 컨테이너에서 getBean함수를 통해
+
+bean을 객체형태로 반환해 그것을 이용한다.
+
+annotation 활용은 낼 다시 ~~
 이건 내일부터 ^^ aop까지 차근차근 크흠
 
 
