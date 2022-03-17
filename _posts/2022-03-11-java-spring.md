@@ -315,10 +315,10 @@ public static void main(String[] args) {
 </beans>
 ```
 
-왠지 보기만해도 뭔말인지 예상이 갈수있다. configuartion data에 다음과 같이 bean태그를 사용해 id 와 class를 정의해주면
+왠지 보기만해도 뭔 말인지 예상이 갈 수 있다. configuartion data에 다음과 같이 bean태그를 사용해 id 와 class를 정의해주면
 id를 변수이름으로한 class 내용의 객체를 bean형태로 저장해준다.
 
-property 태그를 활용해 해당 bean객체의 프로퍼티들을 정의할수있다.
+property 태그를 활용해 해당 bean객체의 프로퍼티들을 정의할 수 있다.
 
  name으로 변수의 이름으로 해주면 변수 set 함수를 통해 알아서 value나 ref값을 주입을 해준다.
 value는 기본적인 리터값을 ref는 다른 bean을 주입한다.
@@ -335,15 +335,91 @@ public static void main(String[] args) {
 	
 		ExamConsole console = context.getBean(ExamConsole.class);//ioc컨테이너에서 ExamConsole.class를 상속한 유사한 빈을 가져옴
 
-		console.print(); //빈함수 출력
+		console.print(); 
 	}
 ```
 주석 만으로도 이해가 갈거라 생각하지만 더 설명을 하자면 해당 ioc 컨테이너에서 getBean함수를 통해
 
 bean을 객체형태로 반환해 그것을 이용한다.
 
-annotation 활용은 낼 다시 ~~
-이건 내일부터 ^^ aop까지 차근차근 크흠
+이번엔 annotation을 사용한예를 보겠다.
+
+먼저 di를 annotation으로 할것이기에 xml에서 di 부분을 주석처리하겠다
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="exam" class="spring.di.entity.SongExam" >
+	
+	<property name="kor" value="20"></property>
+	<property name="eng" value="20"></property>
+	<property name="math" value="20"></property>
+	<property name="com" value="20"></property>
+	</bean>
+	<bean id="console" class="spring.di.ui.InlineExamConsole">
+	<!-- <property name="exam" ref="exam"/> -->
+	</bean>
+</beans>
+```
+
+그리고 di를 할 부분에 <code>@Autowired</code>를 추가 해준다. 
+
+```java
+public class InlineExamConsole implements ExamConsole {
+	private Exam exam;
+	public InlineExamConsole() {}
+	public InlineExamConsole(Exam exam) {
+		this.exam = exam;
+	}
+
+	@Override
+	public void print() {
+		System.out.printf("total is %d, avg if %f\n",exam.total(),exam.avg());
+	}
+	@Autowired //변경사항
+	@Override
+	public void setExam(Exam exam) {
+		this.exam = exam;
+		
+	}
+
+}
+```
+이게끝인가 생각이들겠지만 진짜 이게 끝이다. autowired라고하면 spring에서는 알아서 di를해준다. 정말 똑똑하다!! 라고 한다면 정말 좋겠지만..
+
+하지만 setting.xml에는 몇가지 설정을 해줘야한다. 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"  
+	xsi:schemaLocation=
+	"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<context:annotation-config />
+
+	<bean id="exam" class="spring.di.entity.SongExam" >
+	
+	<property name="kor" value="20"></property>
+	<property name="eng" value="20"></property>
+	<property name="math" value="20"></property>
+	<property name="com" value="20"></property>
+	</bean>
+	<bean id="console" class="spring.di.ui.InlineExamConsole">
+	<!-- <property name="exam" ref="exam"/> -->
+	</bean>
+</beans>
+```
+먼저 xml에서 context라는 태그를 정의하고 그것을 활용해 annotation-config라는걸 사용하였다. 이것을 bean에 annotation이 있는지 확인하고 있다면
+사용하라는것이다.
+
+스프링 di xml과 annotation 활용은 다른 포스트로 자세히 다루겠다.
+
+aop까지 차근차근 크흠
 
 
 
@@ -351,7 +427,7 @@ annotation 활용은 낼 다시 ~~
 <h6>AOP</h6>
 ------
 
-내일 이어서 쓰겠음 
+내일 이어서 쓰겠음
 
 참고 : 
 https://ko.wikipedia.org/wiki/Plain_Old_Java_Object
