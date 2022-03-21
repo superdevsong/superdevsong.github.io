@@ -9,6 +9,8 @@ tags:
 스프링은 무엇이고 왜 쓰는가?
 ------
 
+추가할 dependency는 나중에 정리하겠다.
+
 웹 백엔드라면 많이들어봤을 단어 스프링은 무엇일까?
 스프링은 자바의 프레임워크로 POJO 기반의 엔터프라이즈 어플리케이션을 개발을 쉽고 편하게 돕는다.
 
@@ -417,19 +419,52 @@ public class InlineExamConsole implements ExamConsole {
 먼저 xml에서 context라는 태그를 정의하고 그것을 활용해 annotation-config라는걸 사용하였다. 이것을 bean에 annotation이 있는지 확인하고 있다면
 사용하라는것이다.
 
-스프링 di xml과 annotation 활용은 다른 포스트로 자세히 다루겠다.
-
-aop까지 차근차근 크흠
-
-
+스프링 di코드 더 자세한 활용은 다른 포스트로 자세히 다루겠다.
 
 
 <h6>AOP</h6>
 ------
 
-내일 이어서 쓰겠음
+스프링은 aop 알기전에 aop는 무엇일까? Aspect-oriented Programming (AOP) 관점 지향적 프로그래밍 이는 oop처럼 하나의 프로그래밍 패러다임이다.
 
-참고 : 
+그렇다면 이는 어떤 차이점이 있을까 스프링 doc에서는 이렇게 설명되어있다. OOP에서 모듈화의 주요 단위는 클래스인 반면, AOP에서 모듈화의 단위는 측면입니다.
+
+여기까지만 본다면 어떠한 aspect(측면)으로 모듈화한다는것이 이해가 안갈수있음
+
+다음 스프링 문서글을 참고해 보겠다.
+
+측면은 여러 유형 및 객체에 걸친 관심 사항(concerns)(예: 트랜잭션 관리)을 모듈화할 수 있도록 지원합니다. (AOP 문헌에서는 이러한 관심사항을 cross-cutting concerns(횡단 관심사) 라고 부릅니다.)
+
+oop에서는 통해 공통적으로 많이쓰이는 부분을 객체로 모듈화해서 쓰나 transaction이나 logging처럼 모듈안에서도 공통적으로 많이쓰이는 코드가 여전히 존재했고 aop에서는 이를 
+cross-cutting concerns(횡단 관심사항(공통 관심사항으로 해석하는게 이해하기 쉬움))으로 두고 모듈화해서 코드의 재사용성 가독성을 높인 다는것이다. 
+
+참고로 위에서 cross-cutting concern말고 핵심적인 비즈니스 로직을 core concern이라고 한다.
+
+그리고 이러한 aop를 스프링에서 지원한다.
+
+그렇다면 어떤식으로 스프링은 aop를 지원할까?
+
+당연하게도 스프링에서는 이를 ioc에서 bean으로 다룬다. 그래서 이를 다루는 방법은 xml과 어노테이션으로 나눈다.
+
+이번에는 annotation만으로 설명을 하겠다.
+
+일단 다음과 같은 용어를 알아두기 바란다. 
+
+Aspect : 여러 관심사의 모듈화. 주로 부가기능을 모듈화함. 관심사의 모듈
+
+Target : Aspect를 적용하는 곳
+
+Advice : 실제로 핵심기능에서 추가적으로 구현할 기능
+
+JointPoint : Advice를 적용할 위치, advice를 적용할 코드라고 보면됨
+
+PointCut : JoinPoint의 상세한 위치 정보, 
+
+참고로 어노테이션으로 aop를 구현할거면 aspectj dependency를 추가해야하는걸 알아두길 바란다.
+
+코드는 내일 구현 
+
+https://devlog-wjdrbs96.tistory.com/398
 https://ko.wikipedia.org/wiki/Plain_Old_Java_Object
 
 https://www.cisin.com/coffee-break/ko/technology/what-is-an-enterprise-software-and-how-does-its-development-differ-from-normal-software-development.html
