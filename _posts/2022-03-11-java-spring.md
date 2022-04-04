@@ -186,6 +186,7 @@ di를 정리하자면 의존성 주입을 외부에서 두 객체의 관계를 �
 
 Exam을 상속해 자세한 시험을 정의한 songExam
 
+# song exam
 ```java
 public interface Exam {
 	int total();//합계
@@ -460,9 +461,69 @@ JointPoint : Advice를 적용할 위치, advice를 적용할 코드라고 보면
 
 PointCut : JoinPoint의 상세한 위치 정보, 
 
-참고로 어노테이션으로 aop를 구현할거면 aspectj dependency를 추가해야하는걸 알아두길 바란다.
+참고로 어노테이션으로 aop를 구현할거면 aspectj dependency를 추가해야된다. 여기서 보이는 예시는 그냥 이런식으로 사용 된다는 거다. 자세한 사용법은
 
-코드는 내일 구현 
+나중에 따로 정리하겠다. 일단 xml부터 보겠다. 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<context:component-scan base-package="spring.aop.advice"></context:component-scan>
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+	<bean  id ="target" class="spring.aop.entity.SongExam" p:kor="1" p:eng="1" p:math="1" p:com="1" /> 
+	
+	
+	
+</beans>
+```
+xml에는 p aop라는것을 추가적으로 정의하였다. 
+
+여기서 p는 빈의 property value를 쉽게 대입하려고 추가한것이다.
+
+그리고 나중에 다른 포스트에서도 설명할거지만 <code>context:component-scan</code> 태그는 해당 패키지에 @component와 같은 어노테이션이 존재한다면 이것을
+빈으로 만들라는것이다. <code>aop:aspectj-autoproxy</code>자동적으로 프록시를 생성 
+
+프록시는 처리를 제어하는 다른객체라고 보면된다. 
+
+이는 aop에서 어떠한 target이 실행되기전이나 후에 advice가 실행된다고 했을때 이 cross cutting concern을 joinpoint에 적절히 배치될수있도록 제어해준다.
+
+자세한 설명은 다른 포스트에서 하겠다. 
+
+다음으로는 해당 Aspect를 구현할 코드이다.
+
+```java
+
+@Aspect//Aspect임을 표시 
+@Component//bean으로 만들 component임을 표시 
+public class LogBeforeAdvice {
+	@Pointcut("execution(public int spring.aop.entity.*.total())")//pointcut임을 알림 실행할 위치 지정 
+	private void beforePointcut() {
+		
+	}
+	
+	@Before("beforePointcut()")//advice 실행시점 지정 지금은 Core Concern 실행전인 before advice 
+	public void beforeAdvice() 
+	{
+		System.out.println("before : total");
+	}
+}
+
+```
+위와같이 지정하면 songExam의 total함수가 실행되었을때 프록시에서 이를 낚아채 before advice 실행후에 total()을 실행 한다.
+
+사용할 SongExam과 메인코드는 위의 코드의 [참고](#song-exam) 바람
+
+
+
 
 https://devlog-wjdrbs96.tistory.com/398
 https://ko.wikipedia.org/wiki/Plain_Old_Java_Object
