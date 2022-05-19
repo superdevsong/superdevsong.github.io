@@ -21,7 +21,7 @@ tags:
 
 이중 나는 좋아요 싫어요, 답글기능 , 사진첩기능을 맡았다.
 
-![screen1](../assets/images/Projectfolder.png)
+![screen1](/assets/images/Projectfolder.png)
 
 사진은 프로젝트 구조다. 주요 폴더만 소개 하겠다. 
 
@@ -139,7 +139,7 @@ module.exports = db;
 ```javascript
 const { sequelize } = require('./models');// /models/index
 //구조 분해 할당으로 db에서 sequelize 프로퍼티를 변수에 할당한다
-
+//...
 sequelize.sync({ force: false })//sequelize연동을 한다.
   .then(() => {
     console.log('데이터베이스 연결 성공');
