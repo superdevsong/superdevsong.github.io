@@ -104,7 +104,7 @@ analytics:
 author:
   name             : "Song YoungWoo"
   avatar           : "/assets/images/mypicture.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "컴퓨터 공학과 학사학위"
+  bio              : "컴퓨터 공학과 4학년 재학"
   location         : #"somewhere"
   email            : "superdevsong@gmail.com"
   links:
