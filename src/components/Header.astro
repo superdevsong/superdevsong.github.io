@@ -1,0 +1,91 @@
+---
+// Header 컴포넌트
+---
+<header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center">
+        <a href="/" class="text-2xl font-bold text-primary hover:text-secondary transition-colors">SuperDevSong</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <input type="text" placeholder="검색어를 입력하세요..."
+            class="search-input w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-secondary focus:outline-none">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+            <i class="ri-search-line text-secondary text-sm"></i>
+          </div>
+        </div>
+        <a href="https://github.com/superdevsong/" target="_blank" class="flex items-center space-x-2 text-secondary hover:text-primary transition-colors">
+          <div class="w-4 h-4 flex items-center justify-center">
+            <i class="ri-github-line"></i>
+          </div>
+          <span class="text-sm">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input');
+    const blogCards = document.querySelectorAll('.blog-card');
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        // 검색어가 없으면 모든 카드 표시
+        if (searchTerm === '') {
+          blogCards.forEach(card => {
+            card.style.display = 'block';
+          });
+          
+          // 검색 결과 숨기기
+          if (window.showSearchResults) {
+            window.showSearchResults(blogCards.length, blogCards.length);
+          }
+          return;
+        }
+        
+        let visibleCount = 0;
+        
+        // 블로그 카드 필터링
+        blogCards.forEach(card => {
+          const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
+          const description = card.querySelector('p')?.textContent?.toLowerCase() || '';
+          const tags = JSON.parse(card.getAttribute('data-tags') || '[]').join(' ').toLowerCase();
+          const category = card.getAttribute('data-category')?.toLowerCase() || '';
+          
+          // 제목, 설명, 태그, 카테고리에서 검색
+          const matches = title.includes(searchTerm) || 
+                         description.includes(searchTerm) || 
+                         tags.includes(searchTerm) || 
+                         category.includes(searchTerm);
+          
+          if (matches) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // 검색 결과 표시
+        if (window.showSearchResults) {
+          window.showSearchResults(visibleCount, blogCards.length);
+        }
+        
+        console.log(`검색 결과: ${visibleCount}/${blogCards.length}개 포스트`);
+      });
+      
+      // 검색어 초기화 (ESC 키)
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          this.value = '';
+          this.dispatchEvent(new Event('input'));
+        }
+      });
+    }
+  });
+</script>

@@ -1,0 +1,29 @@
+---
+// ScrollToTop 컴포넌트
+---
+<button id="scrollToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:bg-secondary transition-colors opacity-0 invisible">
+  <div class="w-12 h-12 flex items-center justify-center">
+    <i class="ri-arrow-up-line"></i>
+  </div>
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const scrollButton = document.getElementById('scrollToTop');
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        scrollButton.classList.remove('opacity-0', 'invisible');
+        scrollButton.classList.add('opacity-100', 'visible');
+      } else {
+        scrollButton.classList.add('opacity-0', 'invisible');
+        scrollButton.classList.remove('opacity-100', 'visible');
+      }
+    });
+    scrollButton.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  });
+</script>

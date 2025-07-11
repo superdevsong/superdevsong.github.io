@@ -1,0 +1,30 @@
+---
+// TagFilter 컴포넌트
+export interface Props {
+  allTags?: string[];
+  selectedTag?: string;
+}
+
+const { allTags = [], selectedTag = "전체" } = Astro.props;
+
+// 디버깅을 위한 로그
+console.log('TagFilter received allTags:', allTags);
+
+// 태그가 없으면 컴포넌트를 렌더링하지 않음
+if (!Array.isArray(allTags) || allTags.length === 0) {
+  console.log('No tags available, not rendering TagFilter');
+}
+---
+
+{Array.isArray(allTags) && allTags.length > 0 && (
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center space-x-2 py-3 overflow-x-auto">
+        <button class="tag-chip active px-4 py-2 rounded-full text-sm whitespace-nowrap bg-primary text-white" data-tag="전체">전체</button>
+        {allTags.map(tag => (
+          <button class="tag-chip px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap hover:bg-gray-200" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    </div>
+  </div>
+)} 

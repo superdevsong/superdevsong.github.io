@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import Header from '../components/Header.astro';
+import SearchResults from '../components/SearchResults.astro';
+import BlogCard from '../components/BlogCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import ScrollToTop from '../components/ScrollToTop.astro';
+import "../styles/global.css";
+
+const POSTS_PER_PAGE = 6;
+const posts = await getCollection('blog');
+const blogPosts = posts.map(post => ({
+  title: post.data.title,
+  pubDate: post.data.pubDate,
+  tags: post.data.tags,
+  category: post.data.category,
+  views: post.data.views,
+  likes: post.data.likes,
+  image: post.data.image,
+  description: post.data.description,
+  slug: post.slug,
+  body: post.body
+}));
+
+const allCategories = [...new Set(blogPosts.map(post => post.category))];
+const allTags = [...new Set(blogPosts.flatMap(post => post.tags))];
+const categoryCounts = allCategories.map(category => ({
+  name: category,
+  count: blogPosts.filter(post => post.category === category).length
+}));
+const recentPosts = blogPosts
+  .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+  .slice(0, 4)
+  .map(post => ({
+    title: post.title,
+    pubDate: post.pubDate,
+    slug: post.slug
+  }));
+
+// 페이지네이션 계산
+const totalPosts = blogPosts.length;
+const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+const currentPage = 1;
+const paginatedPosts = blogPosts.slice(0, POSTS_PER_PAGE);
+
+// 디버깅을 위한 로그
+console.log('=== 디버깅 정보 ===');
+console.log('전체 블로그 포스트:', blogPosts.length);
+console.log('추출된 카테고리:', allCategories);
+console.log('카테고리별 포스트 수:', categoryCounts);
+console.log('추출된 태그:', allTags);
+console.log('==================');
+---
+
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개발 블로그 - DevLog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <style>
+    :where([class^="ri-"])::before {
+      content: "\f3c2";
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-primary">
+  <Header />
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <SearchResults />
+    <div class="flex gap-8">
+      <div class="flex-1">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paginatedPosts.map(post => (
+            <BlogCard
+              {...post}
+              content={post.body}
+            />
+          ))}
+        </div>
+        
+        <div class="flex justify-center mt-12">
+          <nav class="flex items-center space-x-2">
+            <a href="#" class={`px-3 py-2 text-sm text-secondary hover:text-primary${currentPage === 1 ? ' pointer-events-none opacity-50' : ''}`}>이전</a>
+            {[...Array(totalPages)].map((_, i) => (
+              i === 0 ? (
+                <span class="px-3 py-2 text-sm bg-primary text-white rounded">1</span>
+              ) : (
+                <a href={`/page/${i+1}`} class="px-3 py-2 text-sm text-secondary hover:text-primary">{i+1}</a>
+              )
+            ))}
+            <a href={totalPages > 1 ? `/page/2` : '#'} class={`px-3 py-2 text-sm text-secondary hover:text-primary${currentPage === totalPages ? ' pointer-events-none opacity-50' : ''}`}>다음</a>
+          </nav>
+        </div>
+      </div>
+      
+      <Sidebar categories={categoryCounts} recentPosts={recentPosts} allTags={allTags} />
+    </div>
+  </main>
+  
+  <ScrollToTop />
+  
+  <script>
+    // 검색 기능
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.querySelector('.search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          const searchTerm = this.value.toLowerCase();
+          console.log('검색어:', searchTerm);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

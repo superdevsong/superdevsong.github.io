@@ -1,0 +1,27 @@
+---
+export interface Props {
+  url: string;
+  image?: string;
+  title?: string;
+  description?: string;
+  site?: string;
+}
+const { url, image, title, description, site } = Astro.props;
+---
+<article class="my-4 max-w-xs bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col">
+  {image && (
+    <div class="h-32 bg-gray-100 flex items-center justify-center overflow-hidden">
+      <img src={image} alt={title || url} class="object-cover w-full h-full" loading="lazy" />
+    </div>
+  )}
+  <div class="flex-1 flex flex-col p-3 gap-2">
+    <a href={url} target="_blank" rel="noopener noreferrer" class="flex-1 group">
+      <h3 class="text-base font-semibold text-primary group-hover:underline line-clamp-2 mb-1">{title ? title : <slot>{url}</slot>}</h3>
+      {description && <p class="text-xs text-secondary line-clamp-2 mb-1">{description}</p>}
+      <div class="flex items-center gap-1 mt-2">
+        <i class="ri-external-link-line text-blue-600 text-lg"></i>
+        <span class="text-xs text-gray-500 truncate">{site ? site : url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+      </div>
+    </a>
+  </div>
+</article>

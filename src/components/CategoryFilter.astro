@@ -1,0 +1,30 @@
+---
+// CategoryFilter 컴포넌트
+export interface Props {
+  allCategories?: string[];
+  selectedCategory?: string;
+}
+
+const { allCategories = [], selectedCategory = "전체" } = Astro.props;
+
+// 디버깅을 위한 로그
+console.log('CategoryFilter received allCategories:', allCategories);
+
+// 카테고리가 없으면 컴포넌트를 렌더링하지 않음
+if (!Array.isArray(allCategories) || allCategories.length === 0) {
+  console.log('No categories available, not rendering CategoryFilter');
+}
+---
+
+{Array.isArray(allCategories) && allCategories.length > 0 && (
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center space-x-2 py-3 overflow-x-auto">
+        <button class="category-chip active px-4 py-2 rounded-full text-sm whitespace-nowrap bg-primary text-white" data-category="전체">전체</button>
+        {allCategories.map(category => (
+          <button class="category-chip px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap hover:bg-gray-200" data-category={category}>{category}</button>
+        ))}
+      </div>
+    </div>
+  </div>
+)} 

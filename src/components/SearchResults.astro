@@ -1,0 +1,48 @@
+---
+// SearchResults 컴포넌트
+---
+<div id="search-results" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 hidden">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <i class="ri-search-line text-blue-600"></i>
+      <span class="text-blue-800 font-medium">
+        <span id="search-count">0</span>개의 결과를 찾았습니다
+      </span>
+    </div>
+    <button id="clear-search" class="text-blue-600 hover:text-blue-800 text-sm">
+      <i class="ri-close-line mr-1"></i>검색 초기화
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchResults = document.getElementById('search-results');
+    const searchCount = document.getElementById('search-count');
+    const clearSearch = document.getElementById('clear-search');
+    const searchInput = document.querySelector('.search-input');
+    
+    // 검색 결과 표시 함수
+    function showSearchResults(count, total) {
+      if (count === total) {
+        searchResults.classList.add('hidden');
+      } else {
+        searchResults.classList.remove('hidden');
+        searchCount.textContent = count;
+      }
+    }
+    
+    // 검색 초기화
+    if (clearSearch) {
+      clearSearch.addEventListener('click', function() {
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.dispatchEvent(new Event('input'));
+        }
+      });
+    }
+    
+    // 전역 함수로 등록 (Header에서 호출)
+    window.showSearchResults = showSearchResults;
+  });
+</script> 

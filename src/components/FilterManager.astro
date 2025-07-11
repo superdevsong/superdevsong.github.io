@@ -1,0 +1,89 @@
+---
+// FilterManager 컴포넌트 - 카테고리와 태그 필터를 함께 관리
+import CategoryFilter from './CategoryFilter.astro';
+import TagFilter from './TagFilter.astro';
+
+export interface Props {
+  allCategories?: string[];
+  allTags?: string[];
+}
+
+const { allCategories = [], allTags = [] } = Astro.props;
+
+// 디버깅을 위한 로그
+console.log('FilterManager - allCategories:', allCategories);
+console.log('FilterManager - allTags:', allTags);
+---
+
+<div class="filter-manager">
+  {Array.isArray(allCategories) && allCategories.length > 0 && (
+    <CategoryFilter allCategories={allCategories} />
+  )}
+  {Array.isArray(allTags) && allTags.length > 0 && (
+    <TagFilter allTags={allTags} />
+  )}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-chip');
+    const tagButtons = document.querySelectorAll('.tag-chip');
+    const blogCards = document.querySelectorAll('.blog-card');
+    
+    let selectedCategory = '전체';
+    let selectedTag = '전체';
+    
+    // 카테고리 필터 이벤트
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        selectedCategory = this.getAttribute('data-category');
+        
+        // 모든 카테고리 버튼에서 active 클래스 제거
+        categoryButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-primary', 'text-white');
+          btn.classList.add('bg-gray-100');
+        });
+        // 클릭된 버튼에 active 클래스 추가
+        this.classList.add('active', 'bg-primary', 'text-white');
+        this.classList.remove('bg-gray-100');
+        
+        applyFilters();
+      });
+    });
+    
+    // 태그 필터 이벤트
+    tagButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        selectedTag = this.getAttribute('data-tag');
+        
+        // 모든 태그 버튼에서 active 클래스 제거
+        tagButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-primary', 'text-white');
+          btn.classList.add('bg-gray-100');
+        });
+        // 클릭된 버튼에 active 클래스 추가
+        this.classList.add('active', 'bg-primary', 'text-white');
+        this.classList.remove('bg-gray-100');
+        
+        applyFilters();
+      });
+    });
+    
+    // 통합 필터링 함수
+    function applyFilters() {
+      blogCards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        const cardTags = JSON.parse(card.getAttribute('data-tags') || '[]');
+        
+        const categoryMatch = selectedCategory === '전체' || cardCategory === selectedCategory;
+        const tagMatch = selectedTag === '전체' || cardTags.includes(selectedTag);
+        
+        if (categoryMatch && tagMatch) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  });
+</script> 

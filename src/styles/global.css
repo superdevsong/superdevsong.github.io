@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.blog-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.tag-chip {
+  transition: all 0.2s ease;
+}
+
+.tag-chip:hover {
+  background-color: #e5e5e5;
+}
+
+.tag-chip.active {
+  background-color: #444444;
+  color: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #666666;
+}
+
+.sidebar-link {
+  transition: color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  color: #333333;
+}
+
+/* Custom markdown heading sizes */
+.prose h1 {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+.prose h2 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-top: 2rem;
+  margin-bottom: 1.2rem;
+}
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}

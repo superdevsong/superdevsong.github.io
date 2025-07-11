@@ -1,0 +1,156 @@
+---
+// Sidebar 컴포넌트
+export interface Props {
+  categories: { name: string; count: number }[];
+  recentPosts?: { title: string; pubDate: string; slug: string }[];
+  allTags?: string[];
+}
+
+const { 
+  categories = [],
+  recentPosts = [],
+  allTags = []
+} = Astro.props;
+
+// 인기 태그 (실제 태그 중에서 상위 8개 선택)
+const popularTags = allTags.length > 0 ? allTags.slice(0, 8) : [];
+
+// 디버깅을 위한 로그
+console.log('Sidebar received categories:', categories);
+console.log('Sidebar received allTags:', allTags);
+console.log('Sidebar popularTags:', popularTags);
+---
+
+<aside class="w-80 space-y-6">
+  {categories.length > 0 && (
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold mb-4 text-primary">카테고리</h3>
+      <ul class="space-y-2">
+        <li>
+          <button class="category-link sidebar-link text-secondary hover:text-primary flex items-center justify-between w-full text-left active" data-category="전체">
+            전체 <span class="text-xs bg-gray-100 px-2 py-1 rounded">{categories.reduce((sum, cat) => sum + cat.count, 0)}</span>
+          </button>
+        </li>
+        {categories.map(category => (
+          <li>
+            <button class="category-link sidebar-link text-secondary hover:text-primary flex items-center justify-between w-full text-left" data-category={category.name}>
+              {category.name} <span class="text-xs bg-gray-100 px-2 py-1 rounded">{category.count}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+  
+  {popularTags.length > 0 && (
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold mb-4 text-primary">인기 태그</h3>
+      <div class="flex flex-wrap gap-2">
+        {popularTags.map(tag => (
+          <span class="tag-filter px-3 py-1 bg-gray-100 text-sm rounded-full text-secondary hover:bg-gray-200 cursor-pointer" data-tag={tag}>{tag}</span>
+        ))}
+      </div>
+    </div>
+  )}
+  
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-semibold mb-4 text-primary">최근 게시물</h3>
+    <ul class="space-y-3">
+      {recentPosts.length > 0 ? recentPosts.map(post => (
+        <li>
+          <a href={`/blog/${post.slug}`} class="block">
+            <h4 class="text-sm font-medium text-primary hover:text-secondary line-clamp-2">{post.title}</h4>
+            <p class="text-xs text-secondary mt-1">{post.pubDate}</p>
+          </a>
+        </li>
+      )) : (
+        <>
+          <li>
+            <a href="#" class="block">
+              <h4 class="text-sm font-medium text-primary hover:text-secondary line-clamp-2">GraphQL과 REST API 비교 분석</h4>
+              <p class="text-xs text-secondary mt-1">2024년 12월 14일</p>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block">
+              <h4 class="text-sm font-medium text-primary hover:text-secondary line-clamp-2">Docker 컨테이너 최적화 가이드</h4>
+              <p class="text-xs text-secondary mt-1">2024년 12월 13일</p>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block">
+              <h4 class="text-sm font-medium text-primary hover:text-secondary line-clamp-2">TypeScript 고급 타입 시스템</h4>
+              <p class="text-xs text-secondary mt-1">2024년 12월 11일</p>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block">
+              <h4 class="text-sm font-medium text-primary hover:text-secondary line-clamp-2">웹 성능 최적화 체크리스트</h4>
+              <p class="text-xs text-secondary mt-1">2024년 12월 9일</p>
+            </a>
+          </li>
+        </>
+      )}
+    </ul>
+  </div>
+</aside>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 카테고리 필터링
+    const categoryLinks = document.querySelectorAll('.category-link');
+    const blogCards = document.querySelectorAll('.blog-card');
+    
+    categoryLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        const category = this.getAttribute('data-category');
+        
+        // 모든 카테고리 링크에서 active 클래스 제거
+        categoryLinks.forEach(l => l.classList.remove('active'));
+        // 클릭된 링크에 active 클래스 추가
+        this.classList.add('active');
+        
+        // 블로그 카드 필터링 (카테고리별)
+        blogCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          
+          if (category === '전체' || cardCategory === category) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+    
+    // 사이드바 태그 필터링
+    const sidebarTags = document.querySelectorAll('.tag-filter');
+    
+    sidebarTags.forEach(tag => {
+      tag.addEventListener('click', function() {
+        const selectedTag = this.getAttribute('data-tag');
+        
+        // 상단 태그 필터 버튼들도 함께 활성화
+        const topTagButtons = document.querySelectorAll('.tag-chip');
+        topTagButtons.forEach(btn => {
+          if (btn.getAttribute('data-tag') === selectedTag) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+        
+        // 블로그 카드 필터링
+        blogCards.forEach(card => {
+          const cardTags = JSON.parse(card.getAttribute('data-tags') || '[]');
+          
+          if (cardTags.includes(selectedTag)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
