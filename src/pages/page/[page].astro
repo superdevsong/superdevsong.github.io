@@ -1,3 +1,4 @@
+---
 import { getCollection } from 'astro:content';
 import Header from '../../components/Header.astro';
 import SearchResults from '../../components/SearchResults.astro';
@@ -52,6 +53,7 @@ const currentPage = Math.max(1, Math.min(Number(page), totalPages));
 const startIdx = (currentPage - 1) * POSTS_PER_PAGE;
 const endIdx = startIdx + POSTS_PER_PAGE;
 const paginatedPosts = blogPosts.slice(startIdx, endIdx);
+---
 
 <html lang="ko">
 <head>
